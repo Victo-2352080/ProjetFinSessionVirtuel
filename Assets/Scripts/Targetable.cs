@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Targetable : MonoBehaviour
+public class Targetable : MonoBehaviour, IHittable
 {
     private Vector3 direction;
     private float speed;
@@ -11,10 +11,15 @@ public class Targetable : MonoBehaviour
     private Vector3 startPosition;
 
     private Animator animator;
+    private AudioSource audioSource;
+
+    [Header("Sound")]
+    [SerializeField] private AudioClip hitSound;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void Init(Vector3 movementDirection, float newSpeed, int newPoints, float newDespawnDistance)
@@ -29,6 +34,12 @@ public class Targetable : MonoBehaviour
 
     void Update()
     {
+        // Stop moving and destroy if game has ended
+        if (!SRGameManager.Instance.IsGameStarted)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         transform.position += direction * speed * Time.deltaTime;
 
@@ -50,6 +61,10 @@ public class Targetable : MonoBehaviour
         SRGameManager.Instance.AddScore(points);
         active = false;
         animator.SetTrigger("Hit");
+        if (audioSource != null && hitSound != null)
+        {
+            audioSource.PlayOneShot(hitSound);
+        }
     }
 
     private void DestroyObject()

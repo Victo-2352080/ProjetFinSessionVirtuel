@@ -40,7 +40,7 @@ public class Fusil : MonoBehaviour
 
     void Update()
     {
-        if (!GMInstance.IsGameStarted) ResetGun();
+
     }
 
     private void ResetGun()
@@ -54,26 +54,24 @@ public class Fusil : MonoBehaviour
 
     private void OnTriggerPressed(ActivateEventArgs args)
     {
-        if (!grab.isSelected || !GMInstance.IsGameStarted) return;
 
+        if (!grab.isSelected) return;
         Tirer();
     }
 
     private void Tirer()
     {
         Instantiate(projectilePrefab, pointDeTir.position, pointDeTir.rotation);
+        HapticFeedback.SendHapticImpulse(0.4f, 0.1f);
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
-        if (!GMInstance.IsGameStarted)
-        {
-            GMInstance.StartGame();
-        }
+        HapticFeedback.SendHapticImpulse(0.6f, 0.15f);
     }
 
     private void OnReleased(SelectExitEventArgs args)
     {
-        // Effectuer une action si on lâche le gun
+        ResetGun();
     }
 }

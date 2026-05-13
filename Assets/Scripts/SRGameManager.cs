@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class SRGameManager : MonoBehaviour
 {
     public static SRGameManager Instance { get; private set; }
 
     [Header("Timer")]
-    [SerializeField] private float gameDuration = 120f; // secondes
+    [SerializeField] private float gameDuration = 120f;
     private float timer;
 
     [Header("Score")]
@@ -21,10 +22,17 @@ public class SRGameManager : MonoBehaviour
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private RawImage countdownBackground;
 
+    [Header("Sound")]
+    [SerializeField] private AudioClip backgroundMusic;
+    private AudioSource audioSource;
+
     private List<int> bestScores = new List<int>();
 
     private bool gameStarted = false;
     public bool IsGameStarted => gameStarted;
+
+    public UnityAction OnGameStart;
+    public UnityAction OnGameEnd;
 
     void Awake()
     {
@@ -37,6 +45,14 @@ public class SRGameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource != null)
+        {
+            audioSource.loop = true;
+            audioSource.clip = backgroundMusic;
+            audioSource.pitch = 1f;
+            audioSource.playOnAwake = false;
+        }
         timer = gameDuration;
 
         UpdateUI();
@@ -90,14 +106,20 @@ public class SRGameManager : MonoBehaviour
 
     public void EndGame()
     {
+        OnGameEnd?.Invoke();
         AddToBestScores(score);
         timer = gameDuration;
         gameStarted = false;
         UpdateUI();
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 
     public void StartGame()
     {
+        OnGameStart?.Invoke();
         StartCoroutine(StartCountdown());
     }
 
@@ -160,8 +182,12 @@ public class SRGameManager : MonoBehaviour
             countdownText.gameObject.SetActive(false);
             countdownBackground.gameObject.SetActive(false);
         }
-            
 
+
+        if (audioSource != null && backgroundMusic != null && !audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
         gameStarted = true;
     }
 }

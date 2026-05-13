@@ -17,14 +17,14 @@ public class Projectile : MonoBehaviour
     {
         float distanceFrame = vitesse * Time.deltaTime;
 
-        // Raycast pour éviter de traverser les objets (important à haute vitesse)
+        // Raycast pour ï¿½viter de traverser les objets (important ï¿½ haute vitesse)
         if (Physics.Raycast(transform.position, -transform.right, out RaycastHit hit, distanceFrame))
         {
-            Targetable target = hit.collider.GetComponent<Targetable>();
+            IHittable hittable = hit.collider.GetComponent<IHittable>();
 
-            if (target != null)
+            if (hittable != null)
             {
-                target.OnHit();
+                hittable.OnHit();
             }
 
             Destroy(gameObject);
@@ -34,7 +34,7 @@ public class Projectile : MonoBehaviour
         // Avancer
         transform.Translate(Vector3.left * distanceFrame);
 
-        // Vérifier distance max
+        // Vï¿½rifier distance max
         if (Vector3.Distance(positionDepart, transform.position) >= distanceMax)
         {
             Destroy(gameObject);

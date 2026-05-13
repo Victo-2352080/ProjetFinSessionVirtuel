@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class SpawnPoint : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class SpawnPoint : MonoBehaviour
     [SerializeField] private int points = 10;
     [SerializeField] private float despawnDistance = 10f;
 
+    private bool spawning = false;
+
     private float timer;
 
     void Start()
@@ -18,11 +21,39 @@ public class SpawnPoint : MonoBehaviour
         timer = spawnInterval;
     }
 
+    void OnEnable()
+    {
+        SRGameManager.Instance.OnGameStart += CommencerSpawn;
+        SRGameManager.Instance.OnGameEnd += ArreterSpawn;
+    }
+
+    void OnDisable()
+    {
+        SRGameManager.Instance.OnGameStart -= CommencerSpawn;
+        SRGameManager.Instance.OnGameEnd -= ArreterSpawn;
+    }
+
+    public void CommencerSpawn()
+    {
+        StartCoroutine(StartSpawningWithDelay());
+    }
+
+    private IEnumerator StartSpawningWithDelay()
+    {
+        yield return new WaitForSeconds(4f);
+        spawning = true;
+    }
+
+    public void ArreterSpawn()
+    {
+        spawning = false;
+    }
+
     void Update()
     {
         timer -= Time.deltaTime;
 
-        if (timer <= 0f)
+        if (timer <= 0f && spawning)
         {
             Spawn();
             timer = spawnInterval;
