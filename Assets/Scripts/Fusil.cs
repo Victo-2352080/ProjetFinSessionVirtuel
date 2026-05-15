@@ -22,6 +22,8 @@ public class Fusil : MonoBehaviour
     void Start()
     {
         GMInstance = SRGameManager.Instance;
+        if (GMInstance != null)
+            GMInstance.OnGameEnd += HandleGameEnd;
     }
 
     void OnEnable()
@@ -36,6 +38,9 @@ public class Fusil : MonoBehaviour
         grab.activated.RemoveListener(OnTriggerPressed);
         grab.selectEntered.RemoveListener(OnGrabbed);
         grab.selectExited.RemoveListener(OnReleased);
+
+        if (GMInstance != null)
+            GMInstance.OnGameEnd -= HandleGameEnd;
     }
 
     void Update()
@@ -72,6 +77,14 @@ public class Fusil : MonoBehaviour
 
     private void OnReleased(SelectExitEventArgs args)
     {
-        ResetGun();
+        HapticFeedback.SendHapticImpulse(0.6f, 0.15f);
+    }
+
+    private void HandleGameEnd()
+    {
+        if (!grab.isSelected)
+        {
+            ResetGun();
+        }
     }
 }

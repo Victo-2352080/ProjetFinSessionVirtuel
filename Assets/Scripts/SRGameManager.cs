@@ -21,6 +21,8 @@ public class SRGameManager : MonoBehaviour
     [SerializeField] private TMP_Text bestScoresText;
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private RawImage countdownBackground;
+    [SerializeField] private GameObject menuTitle;
+    [SerializeField] private TMP_Text gameOverText;
 
     [Header("Sound")]
     [SerializeField] private AudioClip backgroundMusic;
@@ -56,6 +58,8 @@ public class SRGameManager : MonoBehaviour
         timer = gameDuration;
 
         UpdateUI();
+        UpdateMenuTitleVisibility(true);
+        UpdateGameOverText(false);
     }
 
     void Update()
@@ -99,6 +103,20 @@ public class SRGameManager : MonoBehaviour
         }
     }
 
+    private void UpdateMenuTitleVisibility(bool visible)
+    {
+        if (menuTitle != null)
+            menuTitle.SetActive(visible);
+    }
+
+    private void UpdateGameOverText(bool visible)
+    {
+        if (gameOverText != null)
+        {
+            gameOverText.gameObject.SetActive(visible);
+        }
+    }
+
     public void AddScore(int value)
     {
         score += value;
@@ -111,6 +129,8 @@ public class SRGameManager : MonoBehaviour
         timer = gameDuration;
         gameStarted = false;
         UpdateUI();
+        UpdateMenuTitleVisibility(true);
+        UpdateGameOverText(true);
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
@@ -120,6 +140,8 @@ public class SRGameManager : MonoBehaviour
     public void StartGame()
     {
         OnGameStart?.Invoke();
+        UpdateMenuTitleVisibility(false);
+        UpdateGameOverText(false);
         StartCoroutine(StartCountdown());
     }
 
