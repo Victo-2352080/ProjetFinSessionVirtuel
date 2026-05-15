@@ -78,6 +78,7 @@ public class Fusil : MonoBehaviour
     private void OnReleased(SelectExitEventArgs args)
     {
         HapticFeedback.SendHapticImpulse(0.6f, 0.15f);
+        ResetGun();
     }
 
     private void HandleGameEnd()
